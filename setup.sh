@@ -41,3 +41,25 @@ echo '---------------------------'
 kubectl port-forward kuard 8080:8080 > out.log 2>&1 &
 kubectl port-forward deployment/prometheus-grafana 3000 > out.log 2>&1 &
 kubectl port-forward prometheus-prometheus-kube-prometheus-prometheus-0 9090 > out.log 2>&1 &
+
+
+# logging Setup
+# elasticsearch
+kubectl create -f logging/elasticsearch/elasticsearch-service.yaml
+kubectl create -f logging/elasticsearch/elasticsearch-statefulset.yaml
+sleep 30
+kubectl port-forward es-cluster-0 9200:9200 > out.log 2>&1 &
+
+# kibana
+kubectl create -f logging/kibana/kibana-deployment.yaml
+kubectl create -f logging/kibana/kibana-service.yaml
+sleep 30
+kubectl port-forward kibana-74d7cb859b-89hbm 5601:5601 > out.log 2>&1 &
+
+# fluentd
+kubectl create -f logging/fluentd/fluentd-clusterrole.yaml
+kubectl create -f logging/fluentd/fluentd-serviceaccount.yaml
+kubectl create -f logging/fluentd/fluentd-clusterrolebinding.yaml
+kubectl create -f logging/fluentd/fluentd-daemonset.yaml
+
+kubectl create -f logging/log-writer-pod.yaml
