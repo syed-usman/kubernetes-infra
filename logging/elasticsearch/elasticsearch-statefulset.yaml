@@ -30,6 +30,20 @@ spec:
         - containerPort: 9300
           name: inter-node
           protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /
+            port: rest
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /
+            port: rest
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
         volumeMounts:
         - name: data
           mountPath: /usr/share/elasticsearch/data
