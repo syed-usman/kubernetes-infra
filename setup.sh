@@ -18,7 +18,7 @@ helm repo update
 helm install prometheus prometheus-community/kube-prometheus-stack
 
 
-# logging Setup
+# Logging Setup
 echo '---------------------------'
 echo 'Installing ELK from Helm chart'
 echo '---------------------------'

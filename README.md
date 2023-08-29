@@ -113,6 +113,35 @@ Was fruitless as it did not scale as the CPU did not even go up, i could not str
 # Part - 3
 ### How can you detect errors in templating before deployment?
 
+There are several ways to find errors:
+
+1. **Use `helm lint`**: The `helm lint` command can be used to identify issues with your Helm chart. It checks the chart for stuff like missing required values or incorrect template formatting.
+    ```
+    helm lint efk-stack/efk-stack
+    ==> Linting efk-stack/efk-stack
+    [INFO] Chart.yaml: icon is recommended
+    1 chart(s) linted, 0 chart(s) failed
+    ```
+
+2. **Use `helm template`**: The `helm template` command can be used to render templates locally without deploying them to the cluster. This can help you identify any syntax errors or missing values in your templates.
+
+    ```
+    helm template efk-stack/efk-stack
+    ```
+
+3. **Use `kubectl dry-run`**: The `kubectl apply --dry-run=client` command can be used to validate  Kubernetes manifests without actually applying them to the cluster. This can help identify issues, such as missing required fields or incorrect API versions.
+
+    ```
+    kubectl apply --dry-run=client -f /path/to/manifest.yaml
+    ```
+
+4. **Use a Validation Tool**: There are several third-party tools available that can help you validate your Kubernetes manifests, such as kubeval or kube-score. These tools can help you identify common issues with your manifests, such as missing required fields or incorrect API versions.
+
+    ```
+    kubeval /path/to/manifest.yaml
+    ```
+
+
 ### What options are there to revert a failed deployment to a previous version?
 
 ### What metrics does the demo application offer? Which CI/CD tool would be your tool of choice?
