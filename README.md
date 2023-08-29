@@ -144,4 +144,19 @@ There are several ways to find errors:
 
 ### What options are there to revert a failed deployment to a previous version?
 
+- you can use the helm rollback command to rollback a release to a previous revision.
+  ```
+  helm rollback my-release
+  ```
+  If you want to rollback to a specific revision, you can specify the revision number:
+  ```
+  helm rollback my-release 4
+  ```
+
+- if not using helm, kubectl can be used
+  ```
+  kubectl rollout undo deployment/my-deployment --to-revision=2
+  ```
+- Otherwise just go ahead and apply the previous version, but it is not the best approach.
+
 ### What metrics does the demo application offer? Which CI/CD tool would be your tool of choice?
