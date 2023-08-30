@@ -1,4 +1,4 @@
-In this document, I will (attempt to) explain each part of the solution, and showcase my thinking process. 
+In this document, I will (attempt to) explain each part of the solution, and showcase my thinking process. Below you will also find answers to questions from the task.
 
 # Part 0 - Setup
 
@@ -236,3 +236,110 @@ Here are the metrics exposed by kuard over http://localhost:8080/metrics:
 
 
 I would use jenkins, because it is free, open source and has a plethora of plugins. Ideally, would deploy it somewhere in the cloud, do proper permission management and use it to build/test/deploy.
+
+
+---
+1. **How do I place the applications behind an Ingress Controller, and what are Ingress Controllers used for?**
+
+   Ingress Controllers are used for managing access to services in your Kubernetes cluster by external clients. It acts as a reverse proxy and load balancer that routes external HTTP/S traffic to the services.
+
+   Here is an example of an Ingress resource:
+   ```yaml
+   apiVersion: networking.k8s.io/v1
+   kind: Ingress
+   metadata:
+     name: example-ingress
+     annotations:
+       nginx.ingress.kubernetes.io/rewrite-target: /
+   spec:
+     rules:
+     - host: www.example.com
+       http:
+         paths:
+         - path: /app1
+           pathType: Prefix
+           backend:
+             service:
+               name: app1-service
+               port:
+                 number: 80
+         - path: /app2
+           pathType: Prefix
+           backend:
+             service:
+               name: app2-service
+               port:
+                 number: 80
+   ```
+
+2. **What would alerting in the Kubernetes Cluster look like? What options are there? What options are there to fill the TSDB (Time-Series-Database) of a Prometheus server with metrics?**
+
+   Alerting can be set up using the Alertmanager from Prometheus. 
+
+   You can configure Prometheus to set up alerting rules. When an alerting rule is triggered, Prometheus sends an alert to Alertmanager, which then sends the alert to the configured receiver (e.g., email, Slack).
+
+   Here is an example of a Prometheus configuration file with an alerting rule:
+   ```yaml
+   global:
+     scrape_interval: 15s
+
+   alerting:
+     alertmanagers:
+     - static_configs:
+       - targets:
+         - 'alertmanager:9093'
+
+   rule_files:
+     - "alerting_rules.yml"
+   ```
+
+   And here is an example of an alerting rule:
+   ```yaml
+   groups:
+   - name: example
+     rules:
+     - alert: HighRequestLatency
+       expr: http_request_duration_seconds{quantile="0.5"} > 1
+       for: 10m
+       labels:
+         severity: page
+       annotations:
+         summary: "High request latency on {{ $labels.instance }}"
+   ```
+
+3. **What options are there to store sensitive data such as secrets in a GIT repository, and which one would you choose?**
+
+   Storing sensitive data in a Git repository is a bad idea. If you must, encrypt the data before committing it to the repository. 
+   
+   I never had to do it, but i would use a tool that manages the private keys for encryption so I dont have to. From a web search i found one option is to use a tool like SOPS (Secrets OPerationS) which supports multiple key management services, such as AWS KMS, GCP KMS, and Azure Key Vault.
+
+   Here is an example of how to use SOPS to encrypt a file:
+   ```
+   sops --encrypt --gcp-kms projects/my-project/locations/global/keyRings/my-keyring/cryptoKeys/my-key secrets.yaml > secrets.enc.yaml
+   ```
+
+   And then you can decrypt the file with:
+   ```
+   sops --decrypt secrets.enc.yaml > secrets.yaml
+   ```
+
+4. **What options are there to completely remove sensitive data that was mistakenly stored in plain text in the GIT repository?**
+
+   If you mistakenly committed sensitive data in plain text to a Git repository, you need to remove the sensitive data from the Git history.
+
+   One option is to use the `git filter-branch` command to rewrite the Git history and remove the sensitive data. However, this can be a complex and error-prone process.
+
+   Another option is to use a tool like BFG Repo-Cleaner, which is a simpler and faster alternative to `git filter-branch`.
+
+   Here is an example of how to use BFG Repo-Cleaner to remove a file containing sensitive data from a Git repository:
+   ```
+   git clone --mirror git://example.com/some-big-repo.git
+   bfg --delete-files secrets.yaml some-big-repo.git
+   cd some-big-repo.git
+   git reflog expire --expire=now --all && git gc --prune=now --aggressive
+   git push
+   ```
+
+   After you remove the sensitive data from the Git repository, you should also change the sensitive data (e.g., passwords, API keys) because it may have been exposed.
+   
+   source: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository#
