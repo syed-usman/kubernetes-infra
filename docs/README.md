@@ -205,3 +205,34 @@ There are several ways to find errors:
 - Otherwise, just go ahead and apply the previous version, but it is not the best approach.
 
 ### What metrics does the demo application offer? Which CI/CD tool would be your tool of choice?
+
+##### Metrics
+Here are the metrics exposed by kuard over http://localhost:8080/metrics:
+
+1. Go Metrics:
+    - GC invocation durations
+    - Number of goroutines
+    - Go environment information
+    - Memory stats
+    - Number of OS threads created
+
+2. HTTP Metrics:
+    - Request latencies in microseconds
+    - Request sizes in bytes
+    - Total number of HTTP requests made
+    - Response sizes in bytes
+
+3. Process Metrics:
+    - Total user and system CPU time spent in seconds
+    - Maximum number of open file descriptors
+    - Number of open file descriptors
+    - Resident memory size in bytes
+    - Start time of the process since unix epoch in seconds
+    - Virtual memory size in bytes
+    - Maximum amount of virtual memory available in bytes
+
+4. Request Duration Metrics:
+    - Time serving HTTP request for different routes, status codes, and methods
+
+
+I would use jenkins, because it is free, open source and has a plethora of plugins. Ideally, would deploy it somewhere in the cloud, do proper permission management and use it to build/test/deploy.
