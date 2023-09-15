@@ -13,3 +13,4 @@ minikube start \
   --extra-config=scheduler.bind-address=0.0.0.0 \
   --extra-config=controller-manager.bind-address=0.0.0.0 \
   --addons=metrics-server
+  --addons=dashboard
