@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ReplicaSet
+metadata:
+  name: myapp-rc
+  labels: 
+    app: replicasetnginx
+    type: front-end
+spec:
+  template:
+    metadata: 
+      name: myapp-rc-stg
+      labels: 
+        app: replicatesnginx
+        type: front-end
+    spec:
+      containers:
+        - name: nginx-container
+          image: nginx
+  replicas: 3

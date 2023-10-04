@@ -27,20 +27,29 @@ echo '---------------------------'
 kubectl create namespace logging
 kubens logging
 
-helm package efk-stack/efk-stack
-helm install efk-stack efk-stack-0.1.0.tgz
+kubectl apply -f logging/elasticsearch-service.yaml
+kubectl apply -f logging/elasticsearch-statefulset.yaml
+
+kubectl apply -f logging/fluentd-clusterrole.yaml
+kubectl apply -f logging/fluentd-clusterrolebinding.yaml
+kubectl apply -f logging/fluentd-daemonset.yaml
+kubectl apply -f logging/fluentd-serviceaccount.yaml
+
+kubectl apply -f logging/kibana-deployment.yaml
+kubectl apply -f logging/kibana-service.yaml
 
 
-kubectl create namespace main
-kubens main
+
+kubectl create namespace test-apps
+kubens test-apps
 
 # pod that generates bogus logs
-kubectl create -f log-writer-pod.yaml
+kubectl create -f test-apps/log-writer-pod.yaml
 
 # web server setup
-kubectl apply -f webserver/web-server-deployment.yaml
-kubectl apply -f webserver/web-server-service.yaml
-kubectl apply -f webserver/web-server-hpa.yaml
+kubectl apply -f test-apps/web-server-deployment.yaml
+kubectl apply -f test-apps/web-server-service.yaml
+kubectl apply -f test-apps/web-server-hpa.yaml
 
 
 
